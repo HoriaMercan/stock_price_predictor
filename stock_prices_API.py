@@ -10,7 +10,7 @@ import pyspark
 # print(data)
 
 class StockPricesAPI():
-    GeneralURL = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={}&interval={}min&apikey=demo&apikey=9TRLRIYQIS806UCV'
+    GeneralURL = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={}&interval={}min&apikey=demo&apikey='
     spark = sql.SparkSession\
         .builder.appName("Python Spark SQL").getOrCreate()
     def __init__(self):
