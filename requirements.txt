@@ -1,2 +1,5 @@
 flask==2.2.3
 werkzeug==2.2.3
+pyspark==3.5.0
+pathlib==1.0.1
+spacy==3.7.2
