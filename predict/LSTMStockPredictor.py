@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from financedata import WindowTokenizerParser, typeset, Var
 import torch
 from torch.autograd import Variable
+from symbols import abbrevations
 class StockPriceModel(torch.nn.Module):
     def __init__(self, input, hidden, output):
         super().__init__()
@@ -51,7 +52,8 @@ class Predictor():
         return output
     
 if __name__ == "__main__":
-    symbols = ["AMZN", "AAPL", "QBTL", "DISC", "STPL"]
+    symbols = pd.read_csv("./symbols.csv")['Name'].values
+    print(symbols)
     INPUT_DIM = 30
     OUTPUT_DIM = 5
     

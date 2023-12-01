@@ -6,6 +6,7 @@ from math import floor
 import torch
 from sklearn.preprocessing import MinMaxScaler
 from torch.autograd import Variable
+from symbols import abbrevations
 pd.options.display.float_format = '{:.2f}'.format
 np.random.seed(42)
 
@@ -24,7 +25,8 @@ class FinanceData(CSVData):
     
     def getHistory(stock, period):
         msft = yf.Ticker(stock)
-        return msft.history(period=period)
+        h = msft.history(period=period)
+        return h
     
 class WindowTokenizer:
     def __init__(self, data : CSVData):
@@ -48,12 +50,14 @@ class WindowTokenizer:
             return self.X, self.y
         return X, y
 
+from yfinance import shared
+
 class WindowTokenizerParser:
     def __init__(self, input, output):
         self.input = input
         self.output = output
     def get_stock(self, symbol):
-        data = FinanceData.getHistory("AMZN", "12mo")
+        data = FinanceData.getHistory(symbol, "1y")
         tok = WindowTokenizer(data=data)
         X, y = tok.make(self.input, self.output, "Close")
         return X, y
@@ -105,7 +109,10 @@ def typeset(X_train, y_train, x_test, y_test):
 
  
 if __name__ == "__main__":
+    symbols = [abbrevations[k] for k in abbrevations]
+    print(symbols)
     d = WindowTokenizerParser(30, 5).get_stocks(["AMZN", "AAPL", "QBTL", "DISC", "STPL"])
     print(d, file=open("tasks.txt", "wt"))
     X, y = WindowTokenizerParser.unzip(d)
     print(X, y)
+    print(len(X), len(y))
