@@ -1,0 +1,35 @@
+{% extends "hello.html" %}
+{% block body %}
+<div>
+    <h1> helloworld</h1>
+    <div style="height: 50vh; width: 50%;">
+        <canvas id="myChart"></canvas>
+    </div>
+    
+    <script>
+        const labels = {{ time | tojson}};
+    
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: {{ plot_stock_symbol | tojson }},
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: {{ price | tojson}},
+            }]
+        };
+    
+        const config = {
+            type: 'line',
+            data: data,
+            options: { maintainAspectRatio: false }
+        };
+    
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    
+    </script>  
+</div>
+{% endblock body %}
