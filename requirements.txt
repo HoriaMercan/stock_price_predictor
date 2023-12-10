@@ -6,7 +6,7 @@ spacy==3.7.2
 requests==2.31.0
 yfinance==0.2.32
 yahoo-fin==0.8.9.1
-numpy==1.23.5
+numpy
 bokeh==3.3.2
 pandas~=2.1.4
 numpy~=1.26.2
