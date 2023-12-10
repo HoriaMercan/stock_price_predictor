@@ -6,7 +6,7 @@ from math import floor
 import torch
 from sklearn.preprocessing import MinMaxScaler
 from torch.autograd import Variable
-from symbols import abbrevations
+from .symbols import abbrevations
 pd.options.display.float_format = '{:.2f}'.format
 np.random.seed(42)
 
@@ -27,6 +27,24 @@ class FinanceData(CSVData):
         msft = yf.Ticker(stock)
         h = msft.history(period=period)
         return h
+    
+    def getFeatures(stock, testable=True, delta=10):
+        hist = FinanceData.getHistory(stock=stock, period="max")
+        features = hist['Close'].values[-30-delta:-delta]
+        maxx = max(features)
+        minn = min(features)
+        def unscale(array):
+            return np.array([x * (maxx - minn) + minn for x in array])
+        def scale(array):
+            return np.array([(a - minn) / (maxx - minn) for a in array])
+        features = torch.from_numpy(scale(features))
+        print(features.shape)
+        features = torch.reshape(features, (1, features.shape[0]))
+        features = torch.reshape(features, (features.shape[0], 1, features.shape[1]))
+
+        features = features.to(torch.float)
+        # features = Variable(features)
+        return features, scale, unscale, hist['Close'].values[-delta:]
     
 class WindowTokenizer:
     def __init__(self, data : CSVData):

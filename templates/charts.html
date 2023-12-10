@@ -1,7 +1,7 @@
 {% extends "hello.html" %}
 {% block body %}
 <div>
-    <h1> helloworld</h1>
+    <h1> {{ plot_stock_symbol }}'s Prediction on a period of 35 days </h1>
     <div style="height: 50vh; width: 50%;">
         <canvas id="myChart"></canvas>
     </div>
@@ -12,10 +12,15 @@
         const data = {
             labels: labels,
             datasets: [{
-                label: {{ plot_stock_symbol | tojson }},
-                backgroundColor: 'rgb(255, 99, 132)',
+                label: {{ plot_stock_symbol | tojson }} + ' predicted',
+                backgroundColor: 'rgba(255, 99, 132, 0.4)',
                 borderColor: 'rgb(255, 99, 132)',
-                data: {{ price | tojson}},
+                data: {{ predicted | tojson}},
+            }, {
+                label: {{ plot_stock_symbol | tojson }} + ' real',
+                backgroundColor: 'rgba(255, 0, 132, 0.4)',
+                borderColor: 'rgb(255, 0, 132)',
+                data: {{ real | tojson}},
             }]
         };
     

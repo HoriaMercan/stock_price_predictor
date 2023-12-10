@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
-from financedata import WindowTokenizerParser, typeset, Var
+from .financedata import WindowTokenizerParser, typeset, Var
 import torch
 from torch.autograd import Variable
-from symbols import abbrevations
+
 class StockPriceModel(torch.nn.Module):
     def __init__(self, input, hidden, output):
         super().__init__()
@@ -16,6 +16,9 @@ class StockPriceModel(torch.nn.Module):
         _ , (hidden , _) = self.lstm(x)
         hn = hidden.view(-1, self.hidden_size)
         return self.linear(hn)
+    def load_from_path(path):
+        return torch.load(path)
+
 
 class Predictor():
     def __init__(self, model: StockPriceModel, optimizer, loss_fn):
