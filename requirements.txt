@@ -4,3 +4,4 @@ pyspark==3.5.0
 pathlib==1.0.1
 spacy==3.7.2
 requests==2.31.0
+bokeh==3.3.2
