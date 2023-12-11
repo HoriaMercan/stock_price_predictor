@@ -2,7 +2,32 @@
 {% block body %}
 <div>
     Welcome to stock predictor. 
-    <a href="/chart/AMZN">AMZN</a>
-    <a href="/chart/AAPL">AAPL</a>
+    <div class="col sev">
+        <input type="text" onchange="changeInput()" onkeydown="changeInput()" onpaste="changeInput()" oninput="changeInput()" id="filter" placeholder="Enter a stock you want to know about..."/>
+        {% for i in range(size) %}
+            <div class="symbol">
+                <a href="/chart/{{symbols[i]}}">{{names[i]}} | {{symbols[i]}}</a>
+            </div>
+        {% endfor %}
+        <span class="err hide">Nothing was found matching your input :(</span>
+    </div>
+    <script>
+        changeInput = () => {
+            my = document.getElementById("filter")
+            i = 0
+            document.querySelectorAll(".symbol").forEach(el => {
+                el.classList.remove("show")
+                if ((my.value.length < 2 || el.innerText.toLowerCase().includes(my.value.toLowerCase())) && i < 10) {
+                    el.classList.add("show")
+                    i += 1;
+                }
+            })
+            if (i == 0) {
+                document.querySelector(".err").classList.remove("hide");
+            } else {
+                document.querySelector(".err").classList.add("hide");
+            }
+        }
+    </script>
 </div>
 {% endblock body %}

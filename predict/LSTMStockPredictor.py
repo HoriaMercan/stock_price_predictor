@@ -35,7 +35,7 @@ class Predictor():
         for epoch in range(num_epochs):
             outputs = self.model(train_x)
             loss = self.loss_fn(outputs , train_y)
-            # print(f"EPOCH: {epoch}\n", outputs,':outputs\npredict:\n',  train_y, "\n\n@\n\n", train_x, "\n\n\n")
+            print(f"EPOCH: {epoch}\n", outputs,':outputs\npredict:\n',  train_y, "\n\n@\n\n", train_x, "\n\n\n")
 
             self.optimizer.zero_grad()
             loss.backward()
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     INPUT_DIM = 30
     OUTPUT_DIM = 5
     
-    parser = WindowTokenizerParser(INPUT_DIM, OUTPUT_DIM)
+    parser = WindowTokenizerParser(INPUT_DIM, OUTPUT_DIM, diff=True)
     d = parser.get_stocks(symbols=symbols)
     X_train, y_train, x_test, y_test = parser.splitset(d, 0.8)
     X_train, y_train, x_test, y_test = typeset(X_train, y_train, x_test, y_test)

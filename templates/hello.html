@@ -8,7 +8,43 @@
     <meta charset="UTF-8">
     <title>AMG Stock Predictor</title>
 </head>
+<style>
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
 
+    .col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .symbol, .err, input{
+        padding: 10px;
+        
+    }
+
+    .sev {
+        max-height: 600px;
+        overflow: scroll;
+        background-color: #8C92AC;
+        border: 1px solid black;
+    }
+
+    .symbol {
+        display: none;
+    }
+
+    .symbol.show {
+        display: block;
+    }
+    .err{
+        display: block;
+    }
+    .err.hide{
+        display: none;
+    }
+</style>
 <body>
     {%block body%} {%endblock%}
 </body>
