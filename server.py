@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import pandas as pd
+from predict.ARIMA import ARIMA_MODEL
 app = Flask(__name__)
 
 @app.route('/')
@@ -97,6 +98,47 @@ def chart(symbol):
                         predicted2 = base2 + pr2,
                         real2 = base2 + re2,
                         plot_stock_symbol = symbol)
+
+
+
+@app.route('/arima/<symbol>')
+def arima_chart(symbol):
+    arima: ARIMA_MODEL = ARIMA_MODEL(symbol=symbol, logaritm=False)
+    arima.determine_AR_and_MA(0.04, 0.045)
+    data_train = arima.data_train.values
+    data = arima.data.values
+    predicted = arima.model().values
+    total_len = len(data_train) + len(predicted)
+    print('PREDICTED', predicted, 'REAL', data)
+    THRESH = 40
+
+    print("AR-I-MA", arima.AR, arima.I, arima.MA)
+    return render_template(template_name_or_list='arima.html',
+                           time=[i for i in range(total_len - THRESH, total_len)],
+                           predicted=[
+                               (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
+                           ],
+                           real=[data[i] for i in range(total_len - THRESH, total_len)],
+                           plot_stock_symbol=symbol)
+
+
+@app.route('/auto_arima/<symbol>')
+def auto_arima_chart(symbol):
+    arima: ARIMA_MODEL = ARIMA_MODEL(symbol=symbol, logaritm=False)
+    arima.determine_AR_and_MA(0.06, 0.06)
+    data_train = arima.data_train.values
+    data = arima.data.values
+    predicted = arima.auto_model().values
+    total_len = len(data_train) + len(predicted)
+    THRESH = 40
+    return render_template(template_name_or_list='arima.html',
+                           time=[i for i in range(total_len - THRESH, total_len)],
+                           predicted=[
+                               (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
+                           ],
+                           real=[data[i] for i in range(total_len - THRESH, total_len)],
+                           plot_stock_symbol=symbol)
+
 
 if __name__ == '__main__':
     app.run(host = "0.0.0.0", port=5000, debug=True)
