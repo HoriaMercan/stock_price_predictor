@@ -28,28 +28,42 @@ class FinanceData(CSVData):
         h = msft.history(period=period)
         return h
     
-    def getFeatures(stock, testable=True, delta=10):
+    def getFeatures(stock, testable=True, delta=10, input_dim=30, diff=False):
         hist = FinanceData.getHistory(stock=stock, period="max")
-        features = hist['Close'].values[-30-delta:-delta]
+        if diff:
+            input_dim += 1
+        features = hist['Close'].values[-input_dim-delta:-delta]
+        start = features[0]
+        
         maxx = max(features)
         minn = min(features)
+        if diff:
+            maxx = max(features[1:])
+            minn = min(features[1:])
         def unscale(array):
             return np.array([x * (maxx - minn) + minn for x in array])
         def scale(array):
             return np.array([(a - minn) / (maxx - minn) for a in array])
-        features = torch.from_numpy(scale(features))
+        if diff:
+            features = np.diff(scale(features))
+        else:
+            features = scale(features)
+        features = torch.from_numpy(features)
         print(features.shape)
         features = torch.reshape(features, (1, features.shape[0]))
         features = torch.reshape(features, (features.shape[0], 1, features.shape[1]))
 
         features = features.to(torch.float)
         # features = Variable(features)
+        if diff:
+            return features, scale, unscale, hist['Close'].values[-delta:], scale([start])[0]
         return features, scale, unscale, hist['Close'].values[-delta:]
     
 class WindowTokenizer:
-    def __init__(self, data : CSVData):
+    def __init__(self, data : CSVData, diff=False):
         self.data = data
         self.selected = data
+        self.diff = diff
         
     def make_window(self, window, column):
         x = np.concatenate([[np.nan] * (window-1), self.data[column].values])
@@ -58,7 +72,11 @@ class WindowTokenizer:
         return np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
     
     def make(self, x_size, y_size, column, store = True):
-        d = self.make_window(x_size + y_size, column=column)
+        s = x_size + y_size
+        if (self.diff):
+            s = x_size + y_size + 1
+        d = self.make_window(s, column=column)
+
         d = d[~np.isnan(d).any(axis=1)]
         X = d[:, :x_size]
         y = d[:, x_size:]
@@ -71,12 +89,13 @@ class WindowTokenizer:
 from yfinance import shared
 
 class WindowTokenizerParser:
-    def __init__(self, input, output):
+    def __init__(self, input, output, diff=False):
         self.input = input
         self.output = output
+        self.diff = diff
     def get_stock(self, symbol):
-        data = FinanceData.getHistory(symbol, "1y")
-        tok = WindowTokenizer(data=data)
+        data = FinanceData.getHistory(symbol, "max")
+        tok = WindowTokenizer(data=data, diff=self.diff)
         X, y = tok.make(self.input, self.output, "Close")
         return X, y
 
@@ -95,11 +114,14 @@ class WindowTokenizerParser:
     def splitset(self, stocks_array_predictions, train_percentage, to_tensor=True):
         X, y = self.unzip(stocks_array_predictions)
         
+        inp = self.input
         scaler = MinMaxScaler()
         scaler.fit(X.transpose())
         new_data = scaler.transform(np.concatenate((X.transpose(), y.transpose()))).transpose()
-        X = new_data[:,:self.input]
-        y = new_data[:,self.input:]
+        if self.diff:
+            new_data = np.diff(new_data)
+        X = new_data[:,:inp]
+        y = new_data[:,inp:]
 
         train_len = floor(train_percentage * len(X))
         assert len(X) == len(y)
@@ -109,7 +131,6 @@ class WindowTokenizerParser:
         scaler = MinMaxScaler()
         scaler.fit(X_test.transpose())
         X_test = scaler.transform(X_test.transpose()).transpose()
-
         if to_tensor:
             return torch.from_numpy(X_train), torch.from_numpy(y_train), torch.from_numpy(X_test), torch.from_numpy(y_test)
         return X_train, y_train, X_test, y_test
