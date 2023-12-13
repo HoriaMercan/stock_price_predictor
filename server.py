@@ -7,6 +7,9 @@ import __main__
 __main__.StockPriceModel = StockPriceModel
 app = Flask(__name__)
 
+__seconds_in_hour = 3600
+
+
 @app.route('/')
 def hello():
     args = request.args
@@ -50,6 +53,28 @@ def getpred(symbol, path="./predict/mdlfull.t7", offset=19):
     return base, pr, re
 
 import torch
+
+from functools import lru_cache, wraps
+from datetime import datetime, timedelta
+def timed_lru_cache(seconds: int, maxsize: int = 128):
+    def wrapper_cache(func):
+        func = lru_cache(maxsize=maxsize)(func)
+        func.lifetime = timedelta(seconds=seconds)
+        func.expiration = datetime.utcnow() + func.lifetime
+
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if datetime.utcnow() >= func.expiration:
+                func.cache_clear()
+                func.expiration = datetime.utcnow() + func.lifetime
+
+            return func(*args, **kwargs)
+
+        return wrapped_func
+
+    return wrapper_cache
+
+@timed_lru_cache(__seconds_in_hour) # cached for one hour
 def getdiffpred(symbol, path="./predict/mdlbatched.t7", offset=19):
     
     print(symbol)
@@ -110,6 +135,7 @@ def chart(symbol):
 
 
 @app.route('/arima/<symbol>')
+@timed_lru_cache(__seconds_in_hour) # cached for one hour
 def arima_chart(symbol):
     arima: ARIMA_MODEL = ARIMA_MODEL(symbol=symbol, logaritm=False)
     arima.determine_AR_and_MA(0.04, 0.045)
@@ -137,6 +163,7 @@ def arima_chart(symbol):
 
 
 @app.route('/auto_arima/<symbol>')
+@timed_lru_cache(__seconds_in_hour) # cached for one hour
 def auto_arima_chart(symbol):
     arima: ARIMA_MODEL = ARIMA_MODEL(symbol=symbol, logaritm=False)
     arima.determine_AR_and_MA(0.06, 0.06)
