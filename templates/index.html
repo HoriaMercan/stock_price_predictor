@@ -1,33 +1,48 @@
 {% extends "hello.html" %}
 {% block body %}
-<div>
-    Welcome to stock predictor. 
-    <div class="col sev">
-        <input type="text" onchange="changeInput()" onkeydown="changeInput()" onpaste="changeInput()" oninput="changeInput()" id="filter" placeholder="Enter a stock you want to know about..."/>
-        {% for i in range(size) %}
-            <div class="symbol">
-                <a href="/chart/{{symbols[i]}}">{{names[i]}} | {{symbols[i]}}</a>
-            </div>
-        {% endfor %}
-        <span class="err hide">Nothing was found matching your input :(</span>
-    </div>
-    <script>
-        changeInput = () => {
-            my = document.getElementById("filter")
-            i = 0
-            document.querySelectorAll(".symbol").forEach(el => {
-                el.classList.remove("show")
-                if ((my.value.length < 2 || el.innerText.toLowerCase().includes(my.value.toLowerCase())) && i < 10) {
-                    el.classList.add("show")
-                    i += 1;
+
+    <div>
+        Welcome to stock predictor.
+        <div class="col sev">
+            <input class="my-input" type="text" onchange="changeInput()" onkeydown="changeInput()"
+                   onpaste="changeInput()" oninput="changeInput()" id="filter"
+                   placeholder="Enter a stock you want to know about..."/>
+            {% for i in range(size) %}
+                <div class="symbol">
+                    <div class="all-link">
+                        <div class="my-link-main">
+                            <a href="/chart/{{ symbols[i] }}">{{ names[i] }} | {{ symbols[i] }}</a>
+                        </div>
+
+                        <div class="my-link">
+                            <a href="/arima/{{ symbols[i] }}">ARIMA.</a>
+                        </div>
+
+                        <div class="my-link">
+                            <a class="my-link" href="/auto_arima/{{ symbols[i] }}">Auto ARIMA</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <span class="err hide">Nothing was found matching your input :(</span>
+        </div>
+        <script>
+            changeInput = () => {
+                my = document.getElementById("filter")
+                i = 0
+                document.querySelectorAll(".symbol").forEach(el => {
+                    el.classList.remove("show")
+                    if ((my.value.length < 2 || el.innerText.toLowerCase().includes(my.value.toLowerCase())) && i < 10) {
+                        el.classList.add("show")
+                        i += 1;
+                    }
+                })
+                if (i == 0) {
+                    document.querySelector(".err").classList.remove("hide");
+                } else {
+                    document.querySelector(".err").classList.add("hide");
                 }
-            })
-            if (i == 0) {
-                document.querySelector(".err").classList.remove("hide");
-            } else {
-                document.querySelector(".err").classList.add("hide");
             }
-        }
-    </script>
-</div>
+        </script>
+    </div>
 {% endblock body %}
