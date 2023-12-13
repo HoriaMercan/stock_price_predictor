@@ -88,6 +88,8 @@ def getdiffpred(symbol, path="./predict/mdlbatched.t7", offset=19):
     print(base, pr)
     return base.tolist(), pr, re
 
+from datetime import date
+
 @app.route('/chart/<symbol>', methods=['GET'])
 def chart(symbol):
     args = request.args
@@ -102,7 +104,8 @@ def chart(symbol):
                         real = base + re,
                         predicted2 = base + pr,
                         real2 = base + re,
-                        plot_stock_symbol = symbol)
+                        plot_stock_symbol = symbol,
+                        today = date.today().strftime("%B %d, %Y"))
 
 
 
@@ -129,7 +132,8 @@ def arima_chart(symbol):
                                (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
                            ],
                            real2=[data[i] for i in range(total_len - THRESH, total_len)],
-                           plot_stock_symbol=symbol)
+                           plot_stock_symbol=symbol,
+                           today = date.today().strftime("%B %d, %Y"))
 
 
 @app.route('/auto_arima/<symbol>')
@@ -151,7 +155,8 @@ def auto_arima_chart(symbol):
                                (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
                            ],
                            real2=[data[i] for i in range(total_len - THRESH, total_len)],
-                           plot_stock_symbol=symbol)
+                           plot_stock_symbol=symbol,
+                           today = date.today().strftime("%B %d, %Y"))
 
 
 if __name__ == '__main__':
