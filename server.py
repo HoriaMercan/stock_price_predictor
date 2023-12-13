@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request
 import pandas as pd
 from .predict.ARIMA import ARIMA_MODEL
+from .predict.LSTMStockPredictor import StockPriceModel
+from .predict.financedata import FinanceData
+import __main__
+__main__.StockPriceModel = StockPriceModel
 app = Flask(__name__)
 
 @app.route('/')
@@ -20,8 +24,7 @@ def hello():
 def market_price():
     return render_template('markets.html')
 
-from .predict.LSTMStockPredictor import Predictor, StockPriceModel
-from .predict.financedata import FinanceData
+
 # This function will use the name of the stock and will return the evolution over time
 
 def getpred(symbol, path="./predict/mdlfull.t7", offset=19):
