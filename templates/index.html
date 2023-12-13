@@ -2,7 +2,13 @@
 {% block body %}
 
     <div>
-        Welcome to stock predictor.
+    <div style="width: 100vw; display: flex; flex-direction: row; align-items: center; justify-content: center">
+        <h1>Welcome to stock predictor.</h1>
+    </div>
+
+    <div style="width: 100vw; display: flex; flex-direction: row; align-items: center; justify-content: center">
+        <h1>Search for a Stock or click <a href="https://amg-stock-classification.streamlit.app/">here</a> to see our stock classification. </h1>
+    </div>
         <div class="col sev">
             <input class="my-input" type="text" onchange="changeInput()" onkeydown="changeInput()"
                    onpaste="changeInput()" oninput="changeInput()" id="filter"
@@ -10,16 +16,16 @@
             {% for i in range(size) %}
                 <div class="symbol">
                     <div class="all-link">
-                        <div class="my-link-main">
+                        <div class="my-link-main" style="max-width: 50vw">
                             <a href="/chart/{{ symbols[i] }}">{{ names[i] }} | {{ symbols[i] }}</a>
                         </div>
 
                         <div class="my-link">
-                            <a href="/arima/{{ symbols[i] }}">ARIMA.</a>
+                            <a href="/arima/{{ symbols[i] }}"><span>ARIMA</span></a>
                         </div>
 
                         <div class="my-link">
-                            <a class="my-link" href="/auto_arima/{{ symbols[i] }}">Auto ARIMA</a>
+                            <a class="my-link" href="/auto_arima/{{ symbols[i] }}"><span>Auto ARIMA</span></a>
                         </div>
                     </div>
                 </div>

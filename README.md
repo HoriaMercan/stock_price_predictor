@@ -1,5 +1,6 @@
 # AMG Stock Price Predictor
 
+
 This is a stock price predictor using various methods created by second
 year students Ariton Adrian, Ariton Alexandru, Gasan Carol-Luca and Mercan
 Horia.
@@ -17,6 +18,14 @@ Among the libraries we use are the following:
 - numpy - for quick mathematical calculations with tensors
 - sklearn - for data processing (aka scaling)
 - multiprocessing - for parralel data retrieval
+
+# Running the APP
+
+```
+docker build -t pria .
+docker run -p 5000:5000 pria
+http://127.0.0.1
+```
 
 # Project Structure
 
