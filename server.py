@@ -30,6 +30,7 @@ def getpred(symbol, path="./predict/mdlfull.t7", offset=19):
     if (len(feat) == 0):
         return "Error"
     model = StockPriceModel.load_from_path(path)
+    # model.old = True
     first_parameter = next(model.parameters())
     input_shape = first_parameter.size()[1]
     print(model, input_shape)
@@ -45,8 +46,8 @@ def getpred(symbol, path="./predict/mdlfull.t7", offset=19):
     print(base, '\n\n', pr, '\n\n' , re)
     return base, pr, re
 
-
-def getdiffpred(symbol, path="./predict/mdfdiffull.t7", offset=19):
+import torch
+def getdiffpred(symbol, path="./predict/mdlbatched.t7", offset=19):
     
     print(symbol)
     feat, scale, unscale, real, start = FinanceData.getFeatures(stock=symbol, delta=offset, diff=True)
@@ -54,7 +55,8 @@ def getdiffpred(symbol, path="./predict/mdfdiffull.t7", offset=19):
         return "Error"
     print("KKDFDKSJSJKLFJ ", start, feat)
     model = StockPriceModel.load_from_path(path=path)
-    
+    # model.load_state_dict(torch.load("./predict/andumodelul-states.t7"))
+    model.eval()
     detached_feat = feat.detach().numpy()[0][0].tolist()
     output = model(feat)
     print("DF bef ", start, detached_feat)
@@ -86,7 +88,7 @@ def getdiffpred(symbol, path="./predict/mdfdiffull.t7", offset=19):
 @app.route('/chart/<symbol>', methods=['GET'])
 def chart(symbol):
     args = request.args
-    base2, pr2, re2 = getpred(symbol=symbol)
+    # base2, pr2, re2 = getpred(symbol=symbol)
     base, pr, re = getdiffpred(symbol=symbol)
 
     print("BASE PR RE")
@@ -95,8 +97,8 @@ def chart(symbol):
                         time = [i for i in range(35)],
                         predicted = base + pr,
                         real = base + re,
-                        predicted2 = base2 + pr2,
-                        real2 = base2 + re2,
+                        predicted2 = base + pr,
+                        real2 = base + re,
                         plot_stock_symbol = symbol)
 
 

@@ -6,6 +6,7 @@ from math import floor
 import torch
 from sklearn.preprocessing import MinMaxScaler
 from torch.autograd import Variable
+from torch.nn import Parameter
 from .symbols import abbrevations
 pd.options.display.float_format = '{:.2f}'.format
 np.random.seed(42)
@@ -136,7 +137,7 @@ class WindowTokenizerParser:
         return X_train, y_train, X_test, y_test
 
 def Var(X_train, y_train, x_test, y_test):
-    return Variable(X_train), Variable(y_train), Variable(x_test), Variable(y_test) 
+    return Parameter(X_train), Parameter(y_train), Parameter(x_test), Parameter(y_test) 
 
 def typeset(X_train, y_train, x_test, y_test):
     X_train = X_train.to(torch.float)
