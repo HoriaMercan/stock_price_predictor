@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import pandas as pd
-from predict.ARIMA import ARIMA_MODEL
+from .predict.ARIMA import ARIMA_MODEL
 app = Flask(__name__)
 
 @app.route('/')
@@ -20,8 +20,8 @@ def hello():
 def market_price():
     return render_template('markets.html')
 
-from predict.LSTMStockPredictor import Predictor, StockPriceModel
-from predict.financedata import FinanceData
+from .predict.LSTMStockPredictor import Predictor, StockPriceModel
+from .predict.financedata import FinanceData
 # This function will use the name of the stock and will return the evolution over time
 
 def getpred(symbol, path="./predict/mdlfull.t7", offset=19):
@@ -91,13 +91,13 @@ def chart(symbol):
 
     print("BASE PR RE")
     print(base, '\n\n', pr, '\n\n' , re)
-    return render_template(template_name_or_list='charts.html', 
-                        time = [i for i in range(35)],
-                        predicted = base + pr,
-                        real = base + re,
-                        predicted2 = base2 + pr2,
-                        real2 = base2 + re2,
-                        plot_stock_symbol = symbol)
+    return render_template(template_name_or_list='charts_ui.html',
+                           time = [i for i in range(35)],
+                           predicted = base + pr,
+                           real = base + re,
+                           predicted2 = base2 + pr2,
+                           real2 = base2 + re2,
+                           plot_stock_symbol = symbol)
 
 
 
@@ -113,12 +113,17 @@ def arima_chart(symbol):
     THRESH = 40
 
     print("AR-I-MA", arima.AR, arima.I, arima.MA)
-    return render_template(template_name_or_list='arima.html',
+
+    return render_template(template_name_or_list='charts_ui.html',
                            time=[i for i in range(total_len - THRESH, total_len)],
                            predicted=[
                                (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
                            ],
                            real=[data[i] for i in range(total_len - THRESH, total_len)],
+                           predicted2=[
+                               (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
+                           ],
+                           real2=[data[i] for i in range(total_len - THRESH, total_len)],
                            plot_stock_symbol=symbol)
 
 
@@ -131,14 +136,18 @@ def auto_arima_chart(symbol):
     predicted = arima.auto_model().values
     total_len = len(data_train) + len(predicted)
     THRESH = 40
-    return render_template(template_name_or_list='arima.html',
+    return render_template(template_name_or_list='charts_ui.html',
                            time=[i for i in range(total_len - THRESH, total_len)],
                            predicted=[
                                (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
                            ],
                            real=[data[i] for i in range(total_len - THRESH, total_len)],
+                           predicted2=[
+                               (list(data_train) + list(predicted))[i] for i in range(total_len - THRESH, total_len)
+                           ],
+                           real2=[data[i] for i in range(total_len - THRESH, total_len)],
                            plot_stock_symbol=symbol)
 
 
 if __name__ == '__main__':
-    app.run(host = "0.0.0.0", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=False)
